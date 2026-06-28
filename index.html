@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Do you love me?</title>
+    <style>
+        /* ===== RESET & BASE ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #2b1a1a, #1a0e0e);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --coral: #d97b73;
+            --red: #e2354e;
+            --pink: #ff6b81;
+            --shadow: rgba(0, 0, 0, 0.5);
+        }
+
+        /* ===== JANELA PRINCIPAL ===== */
+        .window {
+            background: #2a1a1a;
+            border: 6px solid var(--coral);
+            border-radius: 20px;
+            padding: 30px 40px 40px;
+            max-width: 460px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7), 0 0 0 2px #4a2a2a inset;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        /* ===== HEADER "LIVE" ===== */
+        .window .title:first-of-type {
+            display: block;
+            font-size: 14px;
+            letter-spacing: 6px;
+            color: var(--red);
+            text-transform: uppercase;
+            font-weight: 700;
+            margin-bottom: 10px;
+            text-shadow: 0 0 12px var(--red), 0 0 30px rgba(226, 53, 78, 0.3);
+            background: rgba(226, 53, 78, 0.08);
+            padding: 6px 0;
+            border-radius: 30px;
+        }
+
+        /* ===== PERGUNTA ===== */
+        .question {
+            font-size: 28px;
+            font-weight: 700;
+            color: #f5e6e6;
+            margin: 8px 0 18px;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+            letter-spacing: 1px;
+        }
+
+        /* ===== CANVAS (gatinho) ===== */
+        #cat {
+            display: block;
+            margin: 10px auto 18px;
+            width: 160px;
+            height: 160px;
+            background: transparent;
+            image-rendering: pixelated;
+            filter: drop-shadow(0 4px 20px rgba(217, 123, 115, 0.3));
+        }
+
+        /* ===== BOTÕES ===== */
+        .buttons {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+            min-height: 70px;
+        }
+
+        .btn {
+            border: none;
+            padding: 14px 40px;
+            border-radius: 60px;
+            font-size: 22px;
+            font-weight: 800;
+            letter-spacing: 2px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-transform: uppercase;
+            box-shadow: 0 6px 0 rgba(0, 0, 0, 0.3);
+            position: relative;
+            min-width: 100px;
+        }
+
+        .btn:active {
+            transform: scale(0.94);
+            box-shadow: 0 2px 0 rgba(0, 0, 0, 0.3);
+        }
+
+        /* Botão SIM */
+        #button {
+            background: linear-gradient(145deg, #ff6b81, #e2354e);
+            color: #fff;
+            border: 2px solid #ff8a9c;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        #button:hover {
+            transform: scale(1.04);
+            box-shadow: 0 8px 0 rgba(0, 0, 0, 0.3), 0 0 30px rgba(226, 53, 78, 0.4);
+        }
+
+        /* Botão NÃO - vai fugir! */
+        #notBtn {
+            background: linear-gradient(145deg, #5a4a4a, #3a2a2a);
+            color: #d0c0c0;
+            border: 2px solid #6a5a5a;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            transition: left 0.08s ease, top 0.08s ease, transform 0.2s;
+            position: relative;
+            z-index: 10;
+        }
+
+        #notBtn:hover {
+            transform: scale(0.96);
+        }
+
+        /* ===== CORAÇÕES CAINDO ===== */
+        .heart-rain {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 9999;
+            overflow: hidden;
+        }
+
+        .heart {
+            position: absolute;
+            font-size: 28px;
+            animation: fall linear forwards;
+            opacity: 0.9;
+            text-shadow: 0 0 20px rgba(255, 50, 80, 0.6);
+            user-select: none;
+        }
+
+        @keyframes fall {
+            0% {
+                transform: translateY(-60px) rotate(0deg) scale(0.6);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(110vh) rotate(720deg) scale(1.2);
+                opacity: 0;
+            }
+        }
+
+        /* ===== RESPONSIVO ===== */
+        @media (max-width: 500px) {
+            .window {
+                padding: 20px;
+            }
+            .question {
+                font-size: 22px;
+            }
+            .btn {
+                padding: 10px 24px;
+                font-size: 18px;
+                min-width: 70px;
+            }
+            .buttons {
+                gap: 20px;
+            }
+            #cat {
+                width: 120px;
+                height: 120px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ===== JANELA ===== -->
+    <section class="window" id="window">
+        <header class="title">LIVE</header>
+        <div class="question" id="title">Do you love me?</div>
+
+        <!-- Canvas do gatinho -->
+        <canvas id="cat" width="200" height="200"></canvas>
+
+        <!-- Botões -->
+        <div class="buttons">
+            <button class="btn" id="button">SIM</button>
+            <button class="btn" id="notBtn">NÃO</button>
+        </div>
+    </section>
+
+    <script>
+        // ============================================================
+        //  1.  DESENHO DO GATINHO NO CANVAS
+        // ============================================================
+        const canvas = document.getElementById('cat');
+        const ctx = canvas.getContext('2d');
+
+        function drawCat() {
+            ctx.clearRect(0, 0, 200, 200);
+
+            // --- Corpo ---
+            ctx.fillStyle = '#3a2a2a';
+            ctx.shadowColor = 'rgba(0,0,0,0.3)';
+            ctx.shadowBlur = 12;
+            ctx.beginPath();
+            ctx.ellipse(100, 130, 50, 40, 0, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.shadowBlur = 0;
+
+            // --- Cabeça ---
+            ctx.fillStyle = '#4a3a3a';
+            ctx.shadowColor = 'rgba(0,0,0,0.2)';
+            ctx.shadowBlur = 10;
+            ctx.beginPath();
+            ctx.ellipse(100, 90, 42, 38, 0, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.shadowBlur = 0;
+
+            // --- Orelhas ---
+            ctx.fillStyle = '#4a3a3a';
+            ctx.beginPath();
+            ctx.moveTo(68, 62);
+            ctx.lineTo(80, 38);
+            ctx.lineTo(92, 58);
+            ctx.fill();
+
+            ctx.beginPath();
+            ctx.moveTo(132, 62);
+            ctx.lineTo(120, 38);
+            ctx.lineTo(108, 58);
+            ctx.fill();
+
+            // Orelha interna (rosa)
+            ctx.fillStyle = '#d97b73';
+            ctx.beginPath();
+            ctx.moveTo(74, 60);
+            ctx.lineTo(82, 44);
+            ctx.lineTo(90, 58);
+            ctx.fill();
+
+            ctx.beginPath();
+            ctx.moveTo(126, 60);
+            ctx.lineTo(118, 44);
+            ctx.lineTo(110, 58);
+            ctx.fill();
+
+            // --- Olhos ---
+            ctx.shadowBlur = 0;
+            // Branco dos olhos
+            ctx.fillStyle = '#f5ede4';
+            ctx.beginPath();
+            ctx.ellipse(82, 86, 14, 16, 0, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.ellipse(118, 86, 14, 16, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Íris
+            ctx.fillStyle = '#4a7a3a';
+            ctx.beginPath();
+            ctx.arc(84, 88, 8, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.arc(116, 88, 8, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Pupilas
+            ctx.fillStyle = '#1a1a1a';
+            ctx.beginPath();
+            ctx.arc(84, 90, 5, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.arc(116, 90, 5, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Brilho nos olhos
+            ctx.fillStyle = '#ffffff';
+            ctx.beginPath();
+            ctx.arc(80, 84, 2.5, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.arc(112, 84, 2.5, 0, Math.PI * 2);
+            ctx.fill();
+
+            // --- Nariz ---
+            ctx.fillStyle = '#e87080';
+            ctx.beginPath();
+            ctx.moveTo(100, 98);
+            ctx.lineTo(94, 104);
+            ctx.lineTo(106, 104);
+            ctx.fill();
+
+            // --- Boca (sorriso) ---
+            ctx.strokeStyle = '#3a2a2a';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.arc(94, 110, 8, 0, Math.PI);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.arc(106, 110, 8, 0, Math.PI);
+            ctx.stroke();
+
+            // --- Bigodes ---
+            ctx.strokeStyle = '#5a4a4a';
+            ctx.lineWidth = 1.5;
+            // Esquerdo
+            ctx.beginPath();
+            ctx.moveTo(72, 96);
+            ctx.lineTo(48, 92);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(72, 100);
+            ctx.lineTo(44, 102);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(72, 104);
+            ctx.lineTo(48, 112);
+            ctx.stroke();
+            // Direito
+            ctx.beginPath();
+            ctx.moveTo(128, 96);
+            ctx.lineTo(152, 92);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(128, 100);
+            ctx.lineTo(156, 102);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(128, 104);
+            ctx.lineTo(152, 112);
+            ctx.stroke();
+
+            // --- Patas (opcional) ---
+            ctx.fillStyle = '#4a3a3a';
+            ctx.shadowBlur = 6;
+            ctx.beginPath();
+            ctx.ellipse(70, 148, 12, 8, -0.2, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.ellipse(130, 148, 12, 8, 0.2, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.shadowBlur = 0;
+
+            // Rabo (curvo)
+            ctx.strokeStyle = '#4a3a3a';
+            ctx.lineWidth = 7;
+            ctx.beginPath();
+            ctx.moveTo(148, 130);
+            ctx.quadraticCurveTo(180, 120, 170, 90);
+            ctx.stroke();
+        }
+
+        drawCat();
+
+        // ============================================================
+        //  2.  LÓGICA DOS BOTÕES
+        // ============================================================
+        const title = document.getElementById('title');
+        const yesBtn = document.getElementById('button');
+        const noBtn = document.getElementById('notBtn');
+        const windowEl = document.getElementById('window');
+
+        // Variável para controlar se o botão SIM já foi clicado
+        let isLoved = false;
+        let yesScale = 1;
+
+        // --- Função para o botão NÃO fugir ---
+        function dodge() {
+            if (isLoved) return; // Se já clicou em SIM, para de fugir
+
+            const winRect = windowEl.getBoundingClientRect();
+            const btnRect = noBtn.getBoundingClientRect();
+
+            // Margem de segurança para não sair da tela
+            const margin = 20;
+            const maxX = window.innerWidth - btnRect.width - margin;
+            const maxY = window.innerHeight - btnRect.height - margin;
+
+            // Posição aleatória dentro da janela visível
+            let left = Math.random() * maxX;
+            let top = Math.random() * maxY;
+
+            // Garante que não fique em cima do botão SIM
+            const yesRect = yesBtn.getBoundingClientRect();
+            while (
+                left < yesRect.right &&
+                left + btnRect.width > yesRect.left &&
+                top < yesRect.bottom &&
+                top + btnRect.height > yesRect.top
+            ) {
+                left = Math.random() * maxX;
+                top = Math.random() * maxY;
+            }
+
+            noBtn.style.position = 'fixed';
+            noBtn.style.left = left + 'px';
+            noBtn.style.top = top + 'px';
+            noBtn.style.transform = `scale(${0.85 + Math.random() * 0.3}) rotate(${(Math.random() - 0.5) * 8}deg)`;
+
+            // Aumenta o botão SIM gradualmente
+            if (yesScale < 2.2) {
+                yesScale += 0.08;
+                yesBtn.style.transform = `scale(${yesScale})`;
+                yesBtn.style.transition = 'transform 0.15s ease';
+            }
+
+            // Efeito de tremor no NÃO
+            noBtn.style.transition = 'left 0.07s ease, top 0.07s ease, transform 0.15s ease';
+        }
+
+        // --- Evento: passar o mouse em cima do NÃO ---
+        noBtn.addEventListener('mouseenter', dodge);
+
+        // --- Evento: toque no NÃO (mobile) ---
+        noBtn.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            dodge();
+        });
+
+        // --- Clique no SIM ---
+        yesBtn.addEventListener('click', () => {
+            if (isLoved) return;
+            isLoved = true;
+
+            // Muda o texto
+            title.textContent = 'Yippeeee! 💖';
+            title.style.color = '#ff8a9c';
+            title.style.textShadow = '0 0 30px rgba(226,53,78,0.6)';
+
+            // Desabilita o NÃO (some)
+            noBtn.style.display = 'none';
+
+            // Animação no SIM
+            yesBtn.style.transform = 'scale(1.3)';
+            yesBtn.style.background = 'linear-gradient(145deg, #ff8a9c, #e2354e)';
+            yesBtn.style.boxShadow = '0 0 60px rgba(226,53,78,0.7)';
+
+            // CORAÇÕES!
+            rainHearts();
+        });
+
+        // ============================================================
+        //  3.  CHUVA DE CORAÇÕES
+        // ============================================================
+        function rainHearts() {
+            const container = document.createElement('div');
+            container.className = 'heart-rain';
+            document.body.appendChild(container);
+
+            const hearts = ['❤️', '💖', '💗', '💕', '💘', '♥️', '💓', '🩷'];
+            const total = 90;
+
+            for (let i = 0; i < total; i++) {
+                const heart = document.createElement('div');
+                heart.className = 'heart';
+                heart.textContent = hearts[Math.floor(Math.random() * hearts.length)];
+                heart.style.left = Math.random() * 100 + '%';
+                heart.style.fontSize = (18 + Math.random() * 40) + 'px';
+                heart.style.animationDuration = (2.5 + Math.random() * 4) + 's';
+                heart.style.animationDelay = (Math.random() * 3) + 's';
+                heart.style.transform = `rotate(${Math.random() * 60 - 30}deg)`;
+                container.appendChild(heart);
+            }
+
+            // Remove a chuva após alguns segundos
+            setTimeout(() => {
+                container.remove();
+            }, 7000);
+        }
+
+        // ============================================================
+        //  4.  PEQUENO EASTER EGG: clicar no gatinho faz ele piscar
+        // ============================================================
+        canvas.addEventListener('click', () => {
+            // Desenha com olhos fechados por um instante
+            const originalDraw = drawCat;
+
+            // Sobrescreve temporariamente
+            const blink = () => {
+                ctx.clearRect(0, 0, 200, 200);
+                // Desenha tudo igual, mas com olhos fechados (linhas)
+                // (Reaproveitamos a função mas trocamos os olhos)
+                drawCat();
+                // Agora desenha traços nos olhos
+                ctx.strokeStyle = '#3a2a2a';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.moveTo(74, 86);
+                ctx.lineTo(90, 86);
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.moveTo(110, 86);
+                ctx.lineTo(126, 86);
+                ctx.stroke();
+            };
+
+            blink();
+            setTimeout(() => {
+                drawCat();
+            }, 250);
+        });
+
+        // ============================================================
+        //  5.  AJUSTE INICIAL: garante que o NÃO fique na posição certa
+        // ============================================================
+        // Remove o position fixed inicial para não quebrar o layout
+        noBtn.style.position = 'relative';
+        noBtn.style.left = 'auto';
+        noBtn.style.top = 'auto';
+
+        console.log('🐱 Gatinho pronto! Clique em SIM para muita fofura!');
+    </script>
+
+</body>
+</html>
